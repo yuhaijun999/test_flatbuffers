@@ -24,7 +24,33 @@ void test_fbs() {
   std::vector<flatbuffers::Offset<dingodb::fbs::common::ScalarDataMapEntry>>
       vecScalarDataMapEntry;
 
-  //   auto scalarfield1 = dingodb::fbs::common::CreateScalarField(builder, );
+  auto field1 = dingodb::fbs::common::ScalarField::ScalarField_booldata;
+
+  std::vector<flatbuffers::Offset<dingodb::fbs::common::ScalarField>>
+      vecFields1;
+
+  auto fields1 = builder.CreateVector(vecFields1);
+
+
+
+  auto scalar_field1 = dingodb::fbs::common::CreateScalarField(
+      builder, dingodb::fbs::common::ScalarFieldType::ScalarFieldType_BOOL,
+      fields1);
+
+  auto scalar_data_map_entry1 = dingodb::fbs::common::CreateScalarDataMapEntry(
+      builder, builder.CreateString("key1"), scalar_field1);
+  vecScalarDataMapEntry.push_back(scalar_data_map_entry1);
+
+  // dingodb::fbs::common::CreateScalarDataMapEntry(::flatbuffers::FlatBufferBuilder
+  // &_fbb);
+
+  // auto scalarfield1 = dingodb::fbs::common::CreateScalarField(builder, );
   //   auto vec1 = dingodb::fbs::common::CreateScalarDataMapEntry(
   //       builder, builder.CreateString("key1"), scalarfield1);
+
+  auto scalar_data = builder.CreateVector(vecScalarDataMapEntry);
+
+  auto vector_scalar_data =
+      dingodb::fbs::common::CreateVectorScalardata(builder, scalar_data);
+  builder.Finish(vector_scalar_data);
 }

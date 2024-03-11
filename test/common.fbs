@@ -61,7 +61,7 @@ fields : [ScalarField];
 
 table ScalarDataMapEntry{
 key : string (key);
-value : ScalarField;
+value : ScalarValue;
 }
 
 table VectorScalardata {
