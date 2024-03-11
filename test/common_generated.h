@@ -448,8 +448,7 @@ struct ScalarDataMapEntry FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
   typedef ScalarDataMapEntryBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_KEY = 4,
-    VT_VALUE_TYPE = 6,
-    VT_VALUE = 8
+    VT_VALUE = 6
   };
   const ::flatbuffers::String *key() const {
     return GetPointer<const ::flatbuffers::String *>(VT_KEY);
@@ -460,72 +459,18 @@ struct ScalarDataMapEntry FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
   int KeyCompareWithValue(const char *_key) const {
     return strcmp(key()->c_str(), _key);
   }
-  dingodb::fbs::common::ScalarField value_type() const {
-    return static_cast<dingodb::fbs::common::ScalarField>(GetField<uint8_t>(VT_VALUE_TYPE, 0));
-  }
-  const void *value() const {
-    return GetPointer<const void *>(VT_VALUE);
-  }
-  template<typename T> const T *value_as() const;
-  const dingodb::fbs::common::bool_data_wrapper *value_as_booldata() const {
-    return value_type() == dingodb::fbs::common::ScalarField_booldata ? static_cast<const dingodb::fbs::common::bool_data_wrapper *>(value()) : nullptr;
-  }
-  const dingodb::fbs::common::int_data_wrapper *value_as_intdata() const {
-    return value_type() == dingodb::fbs::common::ScalarField_intdata ? static_cast<const dingodb::fbs::common::int_data_wrapper *>(value()) : nullptr;
-  }
-  const dingodb::fbs::common::long_data_wrapper *value_as_longdata() const {
-    return value_type() == dingodb::fbs::common::ScalarField_longdata ? static_cast<const dingodb::fbs::common::long_data_wrapper *>(value()) : nullptr;
-  }
-  const dingodb::fbs::common::float_data_wrapper *value_as_floatdata() const {
-    return value_type() == dingodb::fbs::common::ScalarField_floatdata ? static_cast<const dingodb::fbs::common::float_data_wrapper *>(value()) : nullptr;
-  }
-  const dingodb::fbs::common::double_data_wrapper *value_as_doubledata() const {
-    return value_type() == dingodb::fbs::common::ScalarField_doubledata ? static_cast<const dingodb::fbs::common::double_data_wrapper *>(value()) : nullptr;
-  }
-  const dingodb::fbs::common::string_data_wrapper *value_as_stringdata() const {
-    return value_type() == dingodb::fbs::common::ScalarField_stringdata ? static_cast<const dingodb::fbs::common::string_data_wrapper *>(value()) : nullptr;
-  }
-  const dingodb::fbs::common::bytes_data_wrapper *value_as_bytesdata() const {
-    return value_type() == dingodb::fbs::common::ScalarField_bytesdata ? static_cast<const dingodb::fbs::common::bytes_data_wrapper *>(value()) : nullptr;
+  const dingodb::fbs::common::ScalarValue *value() const {
+    return GetPointer<const dingodb::fbs::common::ScalarValue *>(VT_VALUE);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_KEY) &&
            verifier.VerifyString(key()) &&
-           VerifyField<uint8_t>(verifier, VT_VALUE_TYPE, 1) &&
            VerifyOffset(verifier, VT_VALUE) &&
-           VerifyScalarField(verifier, value(), value_type()) &&
+           verifier.VerifyTable(value()) &&
            verifier.EndTable();
   }
 };
-
-template<> inline const dingodb::fbs::common::bool_data_wrapper *ScalarDataMapEntry::value_as<dingodb::fbs::common::bool_data_wrapper>() const {
-  return value_as_booldata();
-}
-
-template<> inline const dingodb::fbs::common::int_data_wrapper *ScalarDataMapEntry::value_as<dingodb::fbs::common::int_data_wrapper>() const {
-  return value_as_intdata();
-}
-
-template<> inline const dingodb::fbs::common::long_data_wrapper *ScalarDataMapEntry::value_as<dingodb::fbs::common::long_data_wrapper>() const {
-  return value_as_longdata();
-}
-
-template<> inline const dingodb::fbs::common::float_data_wrapper *ScalarDataMapEntry::value_as<dingodb::fbs::common::float_data_wrapper>() const {
-  return value_as_floatdata();
-}
-
-template<> inline const dingodb::fbs::common::double_data_wrapper *ScalarDataMapEntry::value_as<dingodb::fbs::common::double_data_wrapper>() const {
-  return value_as_doubledata();
-}
-
-template<> inline const dingodb::fbs::common::string_data_wrapper *ScalarDataMapEntry::value_as<dingodb::fbs::common::string_data_wrapper>() const {
-  return value_as_stringdata();
-}
-
-template<> inline const dingodb::fbs::common::bytes_data_wrapper *ScalarDataMapEntry::value_as<dingodb::fbs::common::bytes_data_wrapper>() const {
-  return value_as_bytesdata();
-}
 
 struct ScalarDataMapEntryBuilder {
   typedef ScalarDataMapEntry Table;
@@ -534,10 +479,7 @@ struct ScalarDataMapEntryBuilder {
   void add_key(::flatbuffers::Offset<::flatbuffers::String> key) {
     fbb_.AddOffset(ScalarDataMapEntry::VT_KEY, key);
   }
-  void add_value_type(dingodb::fbs::common::ScalarField value_type) {
-    fbb_.AddElement<uint8_t>(ScalarDataMapEntry::VT_VALUE_TYPE, static_cast<uint8_t>(value_type), 0);
-  }
-  void add_value(::flatbuffers::Offset<void> value) {
+  void add_value(::flatbuffers::Offset<dingodb::fbs::common::ScalarValue> value) {
     fbb_.AddOffset(ScalarDataMapEntry::VT_VALUE, value);
   }
   explicit ScalarDataMapEntryBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
@@ -555,25 +497,21 @@ struct ScalarDataMapEntryBuilder {
 inline ::flatbuffers::Offset<ScalarDataMapEntry> CreateScalarDataMapEntry(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::String> key = 0,
-    dingodb::fbs::common::ScalarField value_type = dingodb::fbs::common::ScalarField_NONE,
-    ::flatbuffers::Offset<void> value = 0) {
+    ::flatbuffers::Offset<dingodb::fbs::common::ScalarValue> value = 0) {
   ScalarDataMapEntryBuilder builder_(_fbb);
   builder_.add_value(value);
   builder_.add_key(key);
-  builder_.add_value_type(value_type);
   return builder_.Finish();
 }
 
 inline ::flatbuffers::Offset<ScalarDataMapEntry> CreateScalarDataMapEntryDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const char *key = nullptr,
-    dingodb::fbs::common::ScalarField value_type = dingodb::fbs::common::ScalarField_NONE,
-    ::flatbuffers::Offset<void> value = 0) {
+    ::flatbuffers::Offset<dingodb::fbs::common::ScalarValue> value = 0) {
   auto key__ = key ? _fbb.CreateString(key) : 0;
   return dingodb::fbs::common::CreateScalarDataMapEntry(
       _fbb,
       key__,
-      value_type,
       value);
 }
 
