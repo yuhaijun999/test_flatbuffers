@@ -16,6 +16,7 @@
 #include <vector>
 
 #include "common_generated.h"
+#include "flatbuffers/flatbuffer_builder.h"
 #include "flatbuffers/flatbuffers.h"
 
 void test_fbs() {
@@ -26,27 +27,29 @@ void test_fbs() {
 
   auto field1 = dingodb::fbs::common::ScalarField::ScalarField_booldata;
 
-  std::vector<flatbuffers::Offset<dingodb::fbs::common::ScalarField>>
-      vecFields1;
+  std::vector<flatbuffers::Offset<void>> vecFields1;
+
+  std::vector<uint8_t> vecFieldTypes1;
+
+  vecFieldTypes1.push_back(dingodb::fbs::common::ScalarFieldType_BOOL);
+
+  flatbuffers::FlatBufferBuilder fbb;
+
+  auto booldata1 =
+      fbb.CreateStruct(dingodb::fbs::common::bool_data_wrapper(true)).Union();
+
+  vecFields1.push_back(booldata1);
 
   auto fields1 = builder.CreateVector(vecFields1);
+  auto types1 = builder.CreateVector(vecFieldTypes1);
 
-
-
-  auto scalar_field1 = dingodb::fbs::common::CreateScalarField(
+  auto scalar_value1 = dingodb::fbs::common::CreateScalarValue(
       builder, dingodb::fbs::common::ScalarFieldType::ScalarFieldType_BOOL,
-      fields1);
+      types1, fields1);
 
   auto scalar_data_map_entry1 = dingodb::fbs::common::CreateScalarDataMapEntry(
-      builder, builder.CreateString("key1"), scalar_field1);
+      builder, builder.CreateString("key1"), scalar_value1);
   vecScalarDataMapEntry.push_back(scalar_data_map_entry1);
-
-  // dingodb::fbs::common::CreateScalarDataMapEntry(::flatbuffers::FlatBufferBuilder
-  // &_fbb);
-
-  // auto scalarfield1 = dingodb::fbs::common::CreateScalarField(builder, );
-  //   auto vec1 = dingodb::fbs::common::CreateScalarDataMapEntry(
-  //       builder, builder.CreateString("key1"), scalarfield1);
 
   auto scalar_data = builder.CreateVector(vecScalarDataMapEntry);
 
