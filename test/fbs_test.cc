@@ -186,7 +186,7 @@ static auto create_scalar_value_for_serialization(
     }
     case dingodb::fbs::common::ScalarFieldType_STRING: {
       for (int i = 0; i < times; i++) {
-        std::string value = general_data.get_string_data();
+        const std::string &value = general_data.get_string_data();
         create_string_data_wrapper_for_serialization(builder, vecTypes,
                                                      vecFields, value);
       }
@@ -194,7 +194,7 @@ static auto create_scalar_value_for_serialization(
     }
     case dingodb::fbs::common::ScalarFieldType_BYTES: {
       for (int i = 0; i < times; i++) {
-        std::string value = general_data.get_bytes_data();
+        const std::string &value = general_data.get_bytes_data();
         create_bytes_data_wrapper_for_serialization(builder, vecTypes,
                                                     vecFields, value);
       }

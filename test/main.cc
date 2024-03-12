@@ -24,11 +24,11 @@ int main(int argc, char *argv[]) {
   std::string buffer;
   int times = 10;
 
-  //   fbs_serialization(times, buffer);
-  //   fbs_deserialization(buffer);
+  fbs_serialization(times, buffer);
+  fbs_deserialization(buffer);
 
-  pb_serialization(times, buffer);
-  pb_deserialization(buffer);
+  //   pb_serialization(times, buffer);
+  //   pb_deserialization(buffer);
 
   return 0;
 }
