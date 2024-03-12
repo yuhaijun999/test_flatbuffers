@@ -13,4 +13,29 @@
 // limitations under the License.
 #include "general.h"
 
-void show();
+GeneralData::GeneralData() {}
+
+GeneralData::~GeneralData() {}
+
+bool GeneralData::get_bool_data() {
+  bool_data = !bool_data;
+  return bool_data;
+}
+int32_t GeneralData::get_int_data() { return ++int_data; }
+int64_t GeneralData::get_long_data() {
+  long_data += 100;
+  return long_data;
+}
+float GeneralData::get_float_data() { return ++float_data; }
+double GeneralData::get_double_data() {
+  double_data += 100;
+  return double_data;
+}
+std::string GeneralData::get_string_data() {
+  return string_data + std::to_string(++string_data_index);
+}
+std::string GeneralData::get_bytes_data() {
+  return bytes_data + std::to_string(++bytes_data_index);
+}
+std::string GeneralData::get_key_prefix() { return key_prefix; }
+int32_t GeneralData::get_key_prefix_index() { return key_prefix_index++; }

@@ -14,6 +14,7 @@
 #ifndef FBS_TEST_H
 #define FBS_TEST_H
 
-void test_fbs();
+#include <string>
+void fbs_serialization(int times, std::string &buffer);
 
 #endif /* FBS_TEST_H */

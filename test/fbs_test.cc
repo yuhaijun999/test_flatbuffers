@@ -13,47 +13,330 @@
 // limitations under the License.
 #include "fbs_test.h"
 
+#include <cstdint>
+#include <cstring>
+#include <iterator>
+#include <string>
 #include <vector>
 
-#include "common_generated.h"
+#include "common_generated.h"  // NOLINT
 #include "flatbuffers/flatbuffer_builder.h"
-#include "flatbuffers/flatbuffers.h"
+#include "general.h"
 
-void test_fbs() {
-  flatbuffers::FlatBufferBuilder builder;
+static GeneralData general_data;
+
+static void create_bool_data_wrapper_for_serialization(
+    flatbuffers::FlatBufferBuilder &builder,               // NOLINT
+    std::vector<uint8_t> &field_types,                     // NOLINT
+    std::vector<flatbuffers::Offset<void>> &field_values,  // NOLINT
+    bool value) {
+  field_types.push_back(
+      dingodb::fbs::common::ScalarField::ScalarField_booldata);
+
+  auto off =
+      builder.CreateStruct(dingodb::fbs::common::bool_data_wrapper(value))
+          .Union();
+
+  field_values.push_back(off);
+}
+
+static void create_int_data_wrapper_for_serialization(
+    flatbuffers::FlatBufferBuilder &builder,               // NOLINT
+    std::vector<uint8_t> &field_types,                     // NOLINT
+    std::vector<flatbuffers::Offset<void>> &field_values,  // NOLINT
+    int32_t value) {
+  field_types.push_back(dingodb::fbs::common::ScalarField::ScalarField_intdata);
+
+  auto off = builder.CreateStruct(dingodb::fbs::common::int_data_wrapper(value))
+                 .Union();
+
+  field_values.push_back(off);
+}
+
+static void create_long_data_wrapper_for_serialization(
+    flatbuffers::FlatBufferBuilder &builder,               // NOLINT
+    std::vector<uint8_t> &field_types,                     // NOLINT
+    std::vector<flatbuffers::Offset<void>> &field_values,  // NOLINT
+    int64_t value) {
+  field_types.push_back(
+      dingodb::fbs::common::ScalarField::ScalarField_longdata);
+
+  auto off =
+      builder.CreateStruct(dingodb::fbs::common::long_data_wrapper(value))
+          .Union();
+
+  field_values.push_back(off);
+}
+
+static void create_float_data_wrapper_for_serialization(
+    flatbuffers::FlatBufferBuilder &builder,               // NOLINT
+    std::vector<uint8_t> &field_types,                     // NOLINT
+    std::vector<flatbuffers::Offset<void>> &field_values,  // NOLINT
+    float value) {
+  field_types.push_back(
+      dingodb::fbs::common::ScalarField::ScalarField_floatdata);
+
+  auto off =
+      builder.CreateStruct(dingodb::fbs::common::float_data_wrapper(value))
+          .Union();
+
+  field_values.push_back(off);
+}
+
+static void create_double_data_wrapper_for_serialization(
+    flatbuffers::FlatBufferBuilder &builder,               // NOLINT
+    std::vector<uint8_t> &field_types,                     // NOLINT
+    std::vector<flatbuffers::Offset<void>> &field_values,  // NOLINT
+    double value) {
+  field_types.push_back(
+      dingodb::fbs::common::ScalarField::ScalarField_doubledata);
+
+  auto off =
+      builder.CreateStruct(dingodb::fbs::common::double_data_wrapper(value))
+          .Union();
+
+  field_values.push_back(off);
+}
+
+static void create_string_data_wrapper_for_serialization(
+    flatbuffers::FlatBufferBuilder &builder,               // NOLINT
+    std::vector<uint8_t> &field_types,                     // NOLINT
+    std::vector<flatbuffers::Offset<void>> &field_values,  // NOLINT
+    const std::string &value) {
+  field_types.push_back(
+      dingodb::fbs::common::ScalarField::ScalarField_stringdata);
+
+  auto off = dingodb::fbs::common::Createstring_data_wrapper(
+                 builder, builder.CreateString(value))
+                 .Union();
+
+  field_values.push_back(off);
+}
+
+static void create_bytes_data_wrapper_for_serialization(
+    flatbuffers::FlatBufferBuilder &builder,               // NOLINT
+    std::vector<uint8_t> &field_types,                     // NOLINT
+    std::vector<flatbuffers::Offset<void>> &field_values,  // NOLINT
+    const std::string &value) {
+  field_types.push_back(
+      dingodb::fbs::common::ScalarField::ScalarField_bytesdata);
+  std::vector<uint8_t> internal_value;
+  internal_value.reserve(value.size());
+  std::copy(value.begin(), value.begin(), std::back_inserter(internal_value));
+
+  auto off = dingodb::fbs::common::Createbytes_data_wrapper(
+                 builder, builder.CreateVector(internal_value))
+                 .Union();
+
+  field_values.push_back(off);
+}
+
+static auto create_scalar_value_for_serialization(
+    flatbuffers::FlatBufferBuilder &builder,  // NOLINT
+    dingodb::fbs::common::ScalarFieldType scalar_field_type, int times) {
+  std::vector<flatbuffers::Offset<void>> vecFields;
+  std::vector<uint8_t> vecTypes;
+
+  switch (scalar_field_type) {
+    case dingodb::fbs::common::ScalarFieldType_BOOL: {
+      for (int i = 0; i < times; i++) {
+        bool value = general_data.get_bool_data();
+        create_bool_data_wrapper_for_serialization(builder, vecTypes, vecFields,
+                                                   value);
+      }
+      break;
+    }
+    case dingodb::fbs::common::ScalarFieldType_INT8:
+      [[fallthrough]];
+    case dingodb::fbs::common::ScalarFieldType_INT16:
+      [[fallthrough]];
+    case dingodb::fbs::common::ScalarFieldType_INT32: {
+      for (int i = 0; i < times; i++) {
+        int32_t value = general_data.get_int_data();
+        create_int_data_wrapper_for_serialization(builder, vecTypes, vecFields,
+                                                  value);
+      }
+      break;
+    }
+    case dingodb::fbs::common::ScalarFieldType_INT64: {
+      for (int i = 0; i < times; i++) {
+        int64_t value = general_data.get_long_data();
+        create_long_data_wrapper_for_serialization(builder, vecTypes, vecFields,
+                                                   value);
+      }
+      break;
+    }
+    case dingodb::fbs::common::ScalarFieldType_FLOAT32: {
+      for (int i = 0; i < times; i++) {
+        float value = general_data.get_float_data();
+        create_float_data_wrapper_for_serialization(builder, vecTypes,
+                                                    vecFields, value);
+      }
+      break;
+    }
+    case dingodb::fbs::common::ScalarFieldType_DOUBLE: {
+      for (int i = 0; i < times; i++) {
+        double value = general_data.get_double_data();
+        create_double_data_wrapper_for_serialization(builder, vecTypes,
+                                                     vecFields, value);
+      }
+      break;
+    }
+    case dingodb::fbs::common::ScalarFieldType_STRING: {
+      for (int i = 0; i < times; i++) {
+        std::string value = general_data.get_string_data();
+        create_string_data_wrapper_for_serialization(builder, vecTypes,
+                                                     vecFields, value);
+      }
+      break;
+    }
+    case dingodb::fbs::common::ScalarFieldType_BYTES: {
+      for (int i = 0; i < times; i++) {
+        std::string value = general_data.get_bytes_data();
+        create_bytes_data_wrapper_for_serialization(builder, vecTypes,
+                                                    vecFields, value);
+      }
+      break;
+    }
+    case dingodb::fbs::common::ScalarFieldType_NONE:
+    default:
+      break;
+  }
+
+  auto fields = builder.CreateVector(vecFields);
+  auto types = builder.CreateVector(vecTypes);
+
+  return dingodb::fbs::common::CreateScalarValue(builder, scalar_field_type,
+                                                 types, fields);
+}
+
+static auto create_scalar_data_map_entry_for_serialization(
+    flatbuffers::FlatBufferBuilder &builder, const std::string &key,  // NOLINT
+    dingodb::fbs::common::ScalarFieldType scalar_field_type, int times) {
+  return dingodb::fbs::common::CreateScalarDataMapEntry(
+      builder, builder.CreateString(key),
+      create_scalar_value_for_serialization(builder, scalar_field_type, times));
+}
+
+static auto create_vector_scalar_data_for_serialization(
+    flatbuffers::FlatBufferBuilder &builder, int times) {
+  std::string key;
 
   std::vector<flatbuffers::Offset<dingodb::fbs::common::ScalarDataMapEntry>>
       vecScalarDataMapEntry;
 
-  auto field1 = dingodb::fbs::common::ScalarField::ScalarField_booldata;
+  // bool
+  key = general_data.get_key_prefix() + "_bool_" +
+        std::to_string(general_data.get_key_prefix_index());
 
-  std::vector<flatbuffers::Offset<void>> vecFields1;
+  auto bool_scalar_data_map_entry =
+      dingodb::fbs::common::CreateScalarDataMapEntry(
+          builder, builder.CreateString(key),
+          create_scalar_value_for_serialization(
+              builder,
+              dingodb::fbs::common::ScalarFieldType::ScalarFieldType_BOOL,
+              times));
 
-  std::vector<uint8_t> vecFieldTypes1;
+  vecScalarDataMapEntry.push_back(bool_scalar_data_map_entry);
 
-  vecFieldTypes1.push_back(dingodb::fbs::common::ScalarFieldType_BOOL);
+  // int32
+  key = general_data.get_key_prefix() + "_int_" +
+        std::to_string(general_data.get_key_prefix_index());
 
-  flatbuffers::FlatBufferBuilder fbb;
+  auto int_scalar_data_map_entry =
+      dingodb::fbs::common::CreateScalarDataMapEntry(
+          builder, builder.CreateString(key),
+          create_scalar_value_for_serialization(
+              builder,
+              dingodb::fbs::common::ScalarFieldType::ScalarFieldType_INT32,
+              times));
 
-  auto booldata1 =
-      fbb.CreateStruct(dingodb::fbs::common::bool_data_wrapper(true)).Union();
+  vecScalarDataMapEntry.push_back(int_scalar_data_map_entry);
 
-  vecFields1.push_back(booldata1);
+  // long
+  key = general_data.get_key_prefix() + "_long_" +
+        std::to_string(general_data.get_key_prefix_index());
 
-  auto fields1 = builder.CreateVector(vecFields1);
-  auto types1 = builder.CreateVector(vecFieldTypes1);
+  auto long_scalar_data_map_entry =
+      dingodb::fbs::common::CreateScalarDataMapEntry(
+          builder, builder.CreateString(key),
+          create_scalar_value_for_serialization(
+              builder,
+              dingodb::fbs::common::ScalarFieldType::ScalarFieldType_INT64,
+              times));
 
-  auto scalar_value1 = dingodb::fbs::common::CreateScalarValue(
-      builder, dingodb::fbs::common::ScalarFieldType::ScalarFieldType_BOOL,
-      types1, fields1);
+  vecScalarDataMapEntry.push_back(long_scalar_data_map_entry);
 
-  auto scalar_data_map_entry1 = dingodb::fbs::common::CreateScalarDataMapEntry(
-      builder, builder.CreateString("key1"), scalar_value1);
-  vecScalarDataMapEntry.push_back(scalar_data_map_entry1);
+  // float
+  key = general_data.get_key_prefix() + "_float_" +
+        std::to_string(general_data.get_key_prefix_index());
+
+  auto float_scalar_data_map_entry =
+      dingodb::fbs::common::CreateScalarDataMapEntry(
+          builder, builder.CreateString(key),
+          create_scalar_value_for_serialization(
+              builder,
+              dingodb::fbs::common::ScalarFieldType::ScalarFieldType_FLOAT32,
+              times));
+
+  vecScalarDataMapEntry.push_back(float_scalar_data_map_entry);
+
+  // double
+
+  key = general_data.get_key_prefix() + "_double_" +
+        std::to_string(general_data.get_key_prefix_index());
+
+  auto double_scalar_data_map_entry =
+      dingodb::fbs::common::CreateScalarDataMapEntry(
+          builder, builder.CreateString(key),
+          create_scalar_value_for_serialization(
+              builder,
+              dingodb::fbs::common::ScalarFieldType::ScalarFieldType_DOUBLE,
+              times));
+
+  vecScalarDataMapEntry.push_back(double_scalar_data_map_entry);
+
+  // string
+  key = general_data.get_key_prefix() + "_string_" +
+        std::to_string(general_data.get_key_prefix_index());
+
+  auto string_scalar_data_map_entry =
+      dingodb::fbs::common::CreateScalarDataMapEntry(
+          builder, builder.CreateString(key),
+          create_scalar_value_for_serialization(
+              builder,
+              dingodb::fbs::common::ScalarFieldType::ScalarFieldType_STRING,
+              times));
+
+  vecScalarDataMapEntry.push_back(string_scalar_data_map_entry);
+
+  // bytes
+  key = general_data.get_key_prefix() + "_bytes_" +
+        std::to_string(general_data.get_key_prefix_index());
+
+  auto bytes_scalar_data_map_entry =
+      dingodb::fbs::common::CreateScalarDataMapEntry(
+          builder, builder.CreateString(key),
+          create_scalar_value_for_serialization(
+              builder,
+              dingodb::fbs::common::ScalarFieldType::ScalarFieldType_BYTES,
+              times));
+
+  vecScalarDataMapEntry.push_back(bytes_scalar_data_map_entry);
+
+  //////////////////////////////////////
 
   auto scalar_data = builder.CreateVector(vecScalarDataMapEntry);
 
   auto vector_scalar_data =
       dingodb::fbs::common::CreateVectorScalardata(builder, scalar_data);
   builder.Finish(vector_scalar_data);
+}
+
+void fbs_serialization(int times, std::string &buffer) {  // NOLINT
+  flatbuffers::FlatBufferBuilder builder;
+  create_vector_scalar_data_for_serialization(builder, times);
+
+  buffer.resize(builder.GetSize(), 0);
+  memcpy(buffer.data(), builder.GetBufferPointer(), builder.GetSize());
 }
