@@ -14,4 +14,190 @@
 
 #include "pb_test.h"
 
-void test_pb() {}
+#include "common.pb.h"
+#include "general.h"
+
+static GeneralData general_data;
+
+static void create_bool_data_for_serialization(
+    dingodb::pb::common::ScalarValue &scalar_value) {  // NOLINT
+  dingodb::pb::common::ScalarField *field = scalar_value.add_fields();
+  field->set_bool_data(general_data.get_bool_data());
+}
+
+static void create_int_data_for_serialization(
+    dingodb::pb::common::ScalarValue &scalar_value) {  // NOLINT
+  dingodb::pb::common::ScalarField *field = scalar_value.add_fields();
+  field->set_int_data(general_data.get_int_data());
+}
+
+static void create_long_data_for_serialization(
+    dingodb::pb::common::ScalarValue &scalar_value) {  // NOLINT
+  dingodb::pb::common::ScalarField *field = scalar_value.add_fields();
+  field->set_long_data(general_data.get_long_data());
+}
+
+static void create_float_data_for_serialization(
+    dingodb::pb::common::ScalarValue &scalar_value) {  // NOLINT
+  dingodb::pb::common::ScalarField *field = scalar_value.add_fields();
+  field->set_float_data(general_data.get_float_data());
+}
+
+static void create_double_data_for_serialization(
+    dingodb::pb::common::ScalarValue &scalar_value) {  // NOLINT
+  dingodb::pb::common::ScalarField *field = scalar_value.add_fields();
+  field->set_double_data(general_data.get_double_data());
+}
+
+static void create_string_data_for_serialization(
+    dingodb::pb::common::ScalarValue &scalar_value) {  // NOLINT
+  dingodb::pb::common::ScalarField *field = scalar_value.add_fields();
+  field->set_string_data(general_data.get_string_data());
+}
+
+static void create_bytes_data_for_serialization(
+    dingodb::pb::common::ScalarValue &scalar_value) {  // NOLINT
+  dingodb::pb::common::ScalarField *field = scalar_value.add_fields();
+  field->set_bytes_data(general_data.get_bytes_data());
+}
+
+static void create_scalar_value_for_serialization(
+    dingodb::pb::common::VectorScalardata &vector_scalar_data,
+    int times,  // NOLINT
+    dingodb::pb::common::ScalarFieldType scalar_field_type) {
+  std::string key;
+
+  dingodb::pb::common::ScalarValue scalar_value;
+
+  scalar_value.set_field_type(scalar_field_type);
+
+  switch (scalar_field_type) {
+    case dingodb::pb::common::BOOL: {
+      key = general_data.get_key_prefix() + "_bool_" +
+            std::to_string(general_data.get_key_prefix_index());
+      for (int i = 0; i < times; i++) {
+        create_bool_data_for_serialization(scalar_value);
+      }
+      break;
+    }
+    case dingodb::pb::common::INT8:
+    case dingodb::pb::common::INT16:
+    case dingodb::pb::common::INT32: {
+      key = general_data.get_key_prefix() + "_int_" +
+            std::to_string(general_data.get_key_prefix_index());
+      for (int i = 0; i < times; i++) {
+        create_int_data_for_serialization(scalar_value);
+      }
+      break;
+    }
+    case dingodb::pb::common::INT64: {
+      key = general_data.get_key_prefix() + "_long_" +
+            std::to_string(general_data.get_key_prefix_index());
+      for (int i = 0; i < times; i++) {
+        create_long_data_for_serialization(scalar_value);
+      }
+      break;
+    }
+    case dingodb::pb::common::FLOAT32: {
+      key = general_data.get_key_prefix() + "_float_" +
+            std::to_string(general_data.get_key_prefix_index());
+      for (int i = 0; i < times; i++) {
+        create_float_data_for_serialization(scalar_value);
+      }
+      break;
+    }
+    case dingodb::pb::common::DOUBLE: {
+      key = general_data.get_key_prefix() + "_double_" +
+            std::to_string(general_data.get_key_prefix_index());
+      for (int i = 0; i < times; i++) {
+        create_double_data_for_serialization(scalar_value);
+      }
+      break;
+    }
+    case dingodb::pb::common::STRING: {
+      key = general_data.get_key_prefix() + "_string_" +
+            std::to_string(general_data.get_key_prefix_index());
+      for (int i = 0; i < times; i++) {
+        create_string_data_for_serialization(scalar_value);
+      }
+      break;
+    }
+    case dingodb::pb::common::BYTES: {
+      key = general_data.get_key_prefix() + "_bytes_" +
+            std::to_string(general_data.get_key_prefix_index());
+      for (int i = 0; i < times; i++) {
+        create_bytes_data_for_serialization(scalar_value);
+      }
+      break;
+    }
+    case dingodb::pb::common::NONE:
+    default:
+      break;
+  }
+
+  vector_scalar_data.mutable_scalar_data()->insert(
+      {key, std::move(scalar_value)});
+}
+
+void pb_serialization(int times, std::string &buffer) {
+  dingodb::pb::common::VectorScalardata vector_scalar_data;
+  std::string key;
+
+  create_scalar_value_for_serialization(
+      vector_scalar_data, times, dingodb::pb::common::ScalarFieldType::BOOL);
+  create_scalar_value_for_serialization(
+      vector_scalar_data, times, dingodb::pb::common::ScalarFieldType::INT32);
+  create_scalar_value_for_serialization(
+      vector_scalar_data, times, dingodb::pb::common::ScalarFieldType::INT64);
+  create_scalar_value_for_serialization(
+      vector_scalar_data, times, dingodb::pb::common::ScalarFieldType::FLOAT32);
+  create_scalar_value_for_serialization(
+      vector_scalar_data, times, dingodb::pb::common::ScalarFieldType::DOUBLE);
+  create_scalar_value_for_serialization(
+      vector_scalar_data, times, dingodb::pb::common::ScalarFieldType::STRING);
+  create_scalar_value_for_serialization(
+      vector_scalar_data, times, dingodb::pb::common::ScalarFieldType::BYTES);
+
+  buffer = vector_scalar_data.SerializeAsString();
+
+}  // NOLINT
+void pb_deserialization(const std::string &buffer) {
+  dingodb::pb::common::VectorScalardata vector_scalar;
+  if (!vector_scalar.ParseFromString(buffer)) {
+    std::cout << "ParseFromString failed" << std::endl;
+  }
+
+  for (const auto &one_scalar_data : vector_scalar.scalar_data()) {
+    const auto &key = one_scalar_data.first;
+    (void)key;
+    const auto &scalar_value = one_scalar_data.second;
+
+    auto field_type = scalar_value.field_type();
+    (void)field_type;
+    for (const auto &field : scalar_value.fields()) {
+      if (field.has_bool_data()) {
+        auto bool_data = field.bool_data();
+        (void)bool_data;
+      } else if (field.has_int_data()) {
+        auto int_data = field.int_data();
+        (void)int_data;
+      } else if (field.has_long_data()) {
+        auto long_data = field.long_data();
+        (void)long_data;
+      } else if (field.has_float_data()) {
+        auto float_data = field.float_data();
+        (void)float_data;
+      } else if (field.has_double_data()) {
+        auto double_data = field.double_data();
+        (void)double_data;
+      } else if (field.has_string_data()) {
+        const auto &string_data = field.string_data();
+      } else if (field.has_bytes_data()) {
+        const auto &bytes_data = field.bytes_data();
+      } else {
+      }
+    }
+  }
+
+  // vector_scalar.DebugString();
+}

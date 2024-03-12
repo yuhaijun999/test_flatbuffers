@@ -15,12 +15,14 @@
 
 #include <cstdint>
 #include <cstring>
+#include <iostream>
 #include <iterator>
 #include <string>
 #include <vector>
 
 #include "common_generated.h"  // NOLINT
 #include "flatbuffers/flatbuffer_builder.h"
+#include "flatbuffers/verifier.h"
 #include "general.h"
 
 static GeneralData general_data;
@@ -339,4 +341,94 @@ void fbs_serialization(int times, std::string &buffer) {  // NOLINT
 
   buffer.resize(builder.GetSize(), 0);
   memcpy(buffer.data(), builder.GetBufferPointer(), builder.GetSize());
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void fbs_deserialization(const std::string &buffer) {
+  flatbuffers::FlatBufferBuilder builder;
+  builder.PushBytes(
+      reinterpret_cast<unsigned char *>(const_cast<char *>(buffer.c_str())),
+      buffer.size());
+
+  flatbuffers::Verifier verify(builder.GetCurrentBufferPointer(),
+                               buffer.size());
+  bool verify_flat = dingodb::fbs::common::VerifyVectorScalardataBuffer(verify);
+  if (!verify_flat) {
+    std::cout << "buffer is wrong" << std::endl;
+  }
+
+  auto vector_scalar_data = dingodb::fbs::common::GetVectorScalardata(
+      builder.GetCurrentBufferPointer());
+
+  auto scalar_datas = vector_scalar_data->scalar_data();
+  for (const auto &scalar_data : *scalar_datas) {
+    const auto &key = scalar_data->key();
+    const auto &value = scalar_data->value();
+
+    std::string kye_string(key->c_str(), key->size());
+    auto scalar_field_type = value->field_type();
+    const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *fields =
+        value->fields();
+
+    const ::flatbuffers::Vector<uint8_t> *fields_type = value->fields_type();
+
+    for (size_t i = 0; i < fields->size(); i++) {
+      const dingodb::fbs::common::ScalarField *sf =
+          fields_type->GetAs<dingodb::fbs::common::ScalarField>(i);
+      switch (*sf) {
+        case dingodb::fbs::common::ScalarField_booldata: {
+          const auto *bool_data =
+              fields->GetAs<dingodb::fbs::common::bool_data_wrapper>(i);
+          (void)bool_data->bool_data();
+          break;
+        }
+        case dingodb::fbs::common::ScalarField_intdata: {
+          const auto *int_data =
+              fields->GetAs<dingodb::fbs::common::int_data_wrapper>(i);
+          (void)int_data->int_data();
+          break;
+        }
+        case dingodb::fbs::common::ScalarField_longdata: {
+          const auto *long_data =
+              fields->GetAs<dingodb::fbs::common::long_data_wrapper>(i);
+          (void)long_data->long_data();
+          break;
+        }
+        case dingodb::fbs::common::ScalarField_floatdata: {
+          const auto *float_data =
+              fields->GetAs<dingodb::fbs::common::float_data_wrapper>(i);
+          (void)float_data->float_data();
+          break;
+        }
+        case dingodb::fbs::common::ScalarField_doubledata: {
+          const auto *double_data =
+              fields->GetAs<dingodb::fbs::common::double_data_wrapper>(i);
+          (void)double_data->double_data();
+          break;
+        }
+        case dingodb::fbs::common::ScalarField_stringdata: {
+          const auto *string_data =
+              fields->GetAs<dingodb::fbs::common::string_data_wrapper>(i);
+          (void)string_data->string_data();
+          std::string s(string_data->string_data()->c_str(),
+                        string_data->string_data()->size());
+          (void)s;
+          break;
+        }
+        case dingodb::fbs::common::ScalarField_bytesdata: {
+          const auto *bytes_data =
+              fields->GetAs<dingodb::fbs::common::bytes_data_wrapper>(i);
+          (void)bytes_data->bytes_data();
+          std::string b(bytes_data->bytes_data()->begin(),
+                        bytes_data->bytes_data()->end());
+          (void)b;
+          break;
+        }
+        case dingodb::fbs::common::ScalarField_NONE:
+        default:
+          break;
+      }
+    }
+  }
 }

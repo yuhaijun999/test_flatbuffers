@@ -15,7 +15,20 @@
 
 #include <iostream>
 
+#include "fbs_test.h"
+#include "pb_test.h"
+
 int main(int argc, char *argv[]) {
   std::cout << "main program" << std::endl;
+
+  std::string buffer;
+  int times = 10;
+
+  //   fbs_serialization(times, buffer);
+  //   fbs_deserialization(buffer);
+
+  pb_serialization(times, buffer);
+  pb_deserialization(buffer);
+
   return 0;
 }
