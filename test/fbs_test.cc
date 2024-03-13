@@ -124,7 +124,7 @@ static void create_bytes_data_wrapper_for_serialization(
       dingodb::fbs::common::ScalarField::ScalarField_bytesdata);
   std::vector<uint8_t> internal_value;
   internal_value.reserve(value.size());
-  std::copy(value.begin(), value.begin(), std::back_inserter(internal_value));
+  std::copy(value.begin(), value.end(), std::back_inserter(internal_value));
 
   auto off = dingodb::fbs::common::Createbytes_data_wrapper(
                  builder, builder.CreateVector(internal_value))
@@ -368,15 +368,17 @@ void fbs_deserialization(const std::string &buffer) {
 
     std::string kye_string(key->c_str(), key->size());
     auto scalar_field_type = value->field_type();
+    (void)scalar_field_type;
     const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *fields =
         value->fields();
 
     const ::flatbuffers::Vector<uint8_t> *fields_type = value->fields_type();
 
     for (size_t i = 0; i < fields->size(); i++) {
-      const dingodb::fbs::common::ScalarField *sf =
-          fields_type->GetAs<dingodb::fbs::common::ScalarField>(i);
-      switch (*sf) {
+      const dingodb::fbs::common::ScalarField sf =
+          fields_type->GetEnum<dingodb::fbs::common::ScalarField>(i);
+      // fields_type->GetAs<dingodb::fbs::common::ScalarField>(i);
+      switch (sf) {
         case dingodb::fbs::common::ScalarField_booldata: {
           const auto *bool_data =
               fields->GetAs<dingodb::fbs::common::bool_data_wrapper>(i);
