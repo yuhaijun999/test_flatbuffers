@@ -21,6 +21,7 @@
 
 int main(int argc, char *argv[]) {
   std::string buffer;
+  int array_size = 10;
   int times = 100;
   int64_t pb_serialization_time_ms = 0;
   int64_t pb_deserialization_time_ms = 0;
@@ -58,8 +59,15 @@ int main(int argc, char *argv[]) {
   std::cout << "type : " << type << " times : " << times << std::endl;
 
   if (std::string("all") == type || std::string("pb") == type) {
-    pb_serialization(times, buffer, pb_serialization_time_ms);
-    pb_deserialization(buffer, pb_deserialization_time_ms);
+    for (int i = 0; i < times; i++) {
+      int64_t serialization_time_ms = 0;
+      int64_t deserialization_time_ms = 0;
+      pb_serialization(array_size, buffer, serialization_time_ms);
+      pb_deserialization(buffer, deserialization_time_ms);
+
+      pb_serialization_time_ms += serialization_time_ms;
+      pb_deserialization_time_ms += deserialization_time_ms;
+    }
 
     std::cout << "protobuf   serialization   : " << pb_serialization_time_ms
               << " ms" << std::endl;
@@ -69,8 +77,15 @@ int main(int argc, char *argv[]) {
   }
 
   if (std::string("all") == type || std::string("fbs") == type) {
-    fbs_serialization(times, buffer, fbs_serialization_time_ms);
-    fbs_deserialization(buffer, fbs_deserialization_time_ms);
+    for (int i = 0; i < times; i++) {
+      int64_t serialization_time_ms = 0;
+      int64_t deserialization_time_ms = 0;
+      fbs_serialization(array_size, buffer, serialization_time_ms);
+      fbs_deserialization(buffer, deserialization_time_ms);
+
+      fbs_serialization_time_ms += serialization_time_ms;
+      fbs_deserialization_time_ms += deserialization_time_ms;
+    }
 
     std::cout << "flatbuffer serialization   : " << fbs_serialization_time_ms
               << " ms" << std::endl;

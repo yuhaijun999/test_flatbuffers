@@ -63,7 +63,7 @@ static void create_bytes_data_for_serialization(
 
 static void create_scalar_value_for_serialization(
     dingodb::pb::common::VectorScalardata &vector_scalar_data,
-    int times,  // NOLINT
+    int array_size,  // NOLINT
     dingodb::pb::common::ScalarFieldType scalar_field_type) {
   std::string key;
 
@@ -75,7 +75,7 @@ static void create_scalar_value_for_serialization(
     case dingodb::pb::common::BOOL: {
       key = general_data.get_key_prefix() + "_bool_" +
             std::to_string(general_data.get_key_prefix_index());
-      for (int i = 0; i < times; i++) {
+      for (int i = 0; i < array_size; i++) {
         create_bool_data_for_serialization(scalar_value);
       }
       break;
@@ -85,7 +85,7 @@ static void create_scalar_value_for_serialization(
     case dingodb::pb::common::INT32: {
       key = general_data.get_key_prefix() + "_int_" +
             std::to_string(general_data.get_key_prefix_index());
-      for (int i = 0; i < times; i++) {
+      for (int i = 0; i < array_size; i++) {
         create_int_data_for_serialization(scalar_value);
       }
       break;
@@ -93,7 +93,7 @@ static void create_scalar_value_for_serialization(
     case dingodb::pb::common::INT64: {
       key = general_data.get_key_prefix() + "_long_" +
             std::to_string(general_data.get_key_prefix_index());
-      for (int i = 0; i < times; i++) {
+      for (int i = 0; i < array_size; i++) {
         create_long_data_for_serialization(scalar_value);
       }
       break;
@@ -101,7 +101,7 @@ static void create_scalar_value_for_serialization(
     case dingodb::pb::common::FLOAT32: {
       key = general_data.get_key_prefix() + "_float_" +
             std::to_string(general_data.get_key_prefix_index());
-      for (int i = 0; i < times; i++) {
+      for (int i = 0; i < array_size; i++) {
         create_float_data_for_serialization(scalar_value);
       }
       break;
@@ -109,7 +109,7 @@ static void create_scalar_value_for_serialization(
     case dingodb::pb::common::DOUBLE: {
       key = general_data.get_key_prefix() + "_double_" +
             std::to_string(general_data.get_key_prefix_index());
-      for (int i = 0; i < times; i++) {
+      for (int i = 0; i < array_size; i++) {
         create_double_data_for_serialization(scalar_value);
       }
       break;
@@ -117,7 +117,7 @@ static void create_scalar_value_for_serialization(
     case dingodb::pb::common::STRING: {
       key = general_data.get_key_prefix() + "_string_" +
             std::to_string(general_data.get_key_prefix_index());
-      for (int i = 0; i < times; i++) {
+      for (int i = 0; i < array_size; i++) {
         create_string_data_for_serialization(scalar_value);
       }
       break;
@@ -125,7 +125,7 @@ static void create_scalar_value_for_serialization(
     case dingodb::pb::common::BYTES: {
       key = general_data.get_key_prefix() + "_bytes_" +
             std::to_string(general_data.get_key_prefix_index());
-      for (int i = 0; i < times; i++) {
+      for (int i = 0; i < array_size; i++) {
         create_bytes_data_for_serialization(scalar_value);
       }
       break;
@@ -139,25 +139,32 @@ static void create_scalar_value_for_serialization(
       {key, std::move(scalar_value)});
 }
 
-void pb_serialization(int times, std::string &buffer, int64_t &time_ms) {
+void pb_serialization(int array_size, std::string &buffer, int64_t &time_ms) {
   TimeDiff time_diff;
   dingodb::pb::common::VectorScalardata vector_scalar_data;
   std::string key;
 
   create_scalar_value_for_serialization(
-      vector_scalar_data, times, dingodb::pb::common::ScalarFieldType::BOOL);
+      vector_scalar_data, array_size,
+      dingodb::pb::common::ScalarFieldType::BOOL);
   create_scalar_value_for_serialization(
-      vector_scalar_data, times, dingodb::pb::common::ScalarFieldType::INT32);
+      vector_scalar_data, array_size,
+      dingodb::pb::common::ScalarFieldType::INT32);
   create_scalar_value_for_serialization(
-      vector_scalar_data, times, dingodb::pb::common::ScalarFieldType::INT64);
+      vector_scalar_data, array_size,
+      dingodb::pb::common::ScalarFieldType::INT64);
   create_scalar_value_for_serialization(
-      vector_scalar_data, times, dingodb::pb::common::ScalarFieldType::FLOAT32);
+      vector_scalar_data, array_size,
+      dingodb::pb::common::ScalarFieldType::FLOAT32);
   create_scalar_value_for_serialization(
-      vector_scalar_data, times, dingodb::pb::common::ScalarFieldType::DOUBLE);
+      vector_scalar_data, array_size,
+      dingodb::pb::common::ScalarFieldType::DOUBLE);
   create_scalar_value_for_serialization(
-      vector_scalar_data, times, dingodb::pb::common::ScalarFieldType::STRING);
+      vector_scalar_data, array_size,
+      dingodb::pb::common::ScalarFieldType::STRING);
   create_scalar_value_for_serialization(
-      vector_scalar_data, times, dingodb::pb::common::ScalarFieldType::BYTES);
+      vector_scalar_data, array_size,
+      dingodb::pb::common::ScalarFieldType::BYTES);
 
   buffer = vector_scalar_data.SerializeAsString();
   time_ms = time_diff.GetDiff();

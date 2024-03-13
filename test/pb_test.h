@@ -16,7 +16,7 @@
 #define PB_TEST_H
 
 #include <string>
-void pb_serialization(int times, std::string &buffer,
+void pb_serialization(int array_size, std::string &buffer,
                       int64_t &time_ms);  // NOLINT
 void pb_deserialization(const std::string &buffer, int64_t &time_ms);
 
