@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include <cstddef>
+#include <cstdint>
 #include <iostream>
 
 #include "fbs_test.h"  // NOLINT
@@ -27,6 +28,8 @@ int main(int argc, char *argv[]) {
   int64_t pb_deserialization_time_ms = 0;
   int64_t fbs_serialization_time_ms = 0;
   int64_t fbs_deserialization_time_ms = 0;
+  int64_t pb_bytes = 0;
+  int64_t fbs_bytes = 0;
   std::string type = "all";
 
   std::string tmp_type;
@@ -73,6 +76,7 @@ int main(int argc, char *argv[]) {
       int64_t serialization_time_ms = 0;
       int64_t deserialization_time_ms = 0;
       pb_serialization(array_size, buffer, serialization_time_ms);
+      pb_bytes += buffer.size();
       pb_deserialization(buffer, deserialization_time_ms);
 
       pb_serialization_time_ms += serialization_time_ms;
@@ -80,7 +84,8 @@ int main(int argc, char *argv[]) {
     }
 
     std::cout << "protobuf   serialization   : " << pb_serialization_time_ms
-              << " ms" << std::endl;
+              << " ms"
+              << " bytes : " << pb_bytes << std::endl;
 
     std::cout << "protobuf   deserialization : " << pb_deserialization_time_ms
               << " ms" << std::endl;
@@ -91,6 +96,7 @@ int main(int argc, char *argv[]) {
       int64_t serialization_time_ms = 0;
       int64_t deserialization_time_ms = 0;
       fbs_serialization(array_size, buffer, serialization_time_ms);
+      fbs_bytes += buffer.size();
       fbs_deserialization(buffer, deserialization_time_ms);
 
       fbs_serialization_time_ms += serialization_time_ms;
@@ -98,10 +104,55 @@ int main(int argc, char *argv[]) {
     }
 
     std::cout << "flatbuffer serialization   : " << fbs_serialization_time_ms
-              << " ms" << std::endl;
+              << " ms"
+              << " bytes : " << fbs_bytes << std::endl;
 
     std::cout << "flatbuffer deserialization : " << fbs_deserialization_time_ms
               << " ms" << std::endl;
+  }
+
+  if (0 != fbs_serialization_time_ms && 0 != pb_serialization_time_ms) {
+    if (fbs_serialization_time_ms > pb_serialization_time_ms) {
+      std::cout << "serialization_time_ms   flatbuffer/protobuf : "
+                << static_cast<double>(fbs_serialization_time_ms) /
+                       static_cast<double>(pb_serialization_time_ms)
+                << std::endl;
+    } else {
+      std::cout << "serialization_time_ms   protobuf/flatbuffer : "
+                << static_cast<double>(
+                       pb_serialization_time_ms /
+                       static_cast<double>(fbs_serialization_time_ms))
+                << std::endl;
+    }
+  }
+
+  if (0 != fbs_deserialization_time_ms && 0 != pb_deserialization_time_ms) {
+    if (fbs_deserialization_time_ms > pb_deserialization_time_ms) {
+      std::cout << "deserialization_time_ms flatbuffer/protobuf : "
+                << static_cast<double>(fbs_deserialization_time_ms) /
+                       static_cast<double>(pb_deserialization_time_ms)
+                << std::endl;
+    } else {
+      std::cout << "deserialization_time_ms protobuf/flatbuffer : "
+                << static_cast<double>(
+                       pb_deserialization_time_ms /
+                       static_cast<double>(fbs_deserialization_time_ms))
+                << std::endl;
+    }
+  }
+
+  if (0 != fbs_bytes && 0 != pb_bytes) {
+    if (fbs_bytes > pb_bytes) {
+      std::cout << "bytes                   flatbuffer/protobuf : "
+                << static_cast<double>(fbs_bytes) /
+                       static_cast<double>(pb_bytes)
+                << std::endl;
+    } else {
+      std::cout << "bytes                   protobuf/flatbuffer : "
+                << static_cast<double>(pb_bytes /
+                                       static_cast<double>(fbs_bytes))
+                << std::endl;
+    }
   }
 
   return 0;

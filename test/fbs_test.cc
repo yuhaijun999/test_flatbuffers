@@ -25,6 +25,11 @@
 #include "flatbuffers/verifier.h"
 #include "general.h"
 
+#ifndef FBS_USE_DATA
+#define FBS_USE_DATA
+#endif
+#undef FBS_USE_DATA
+
 static GeneralData general_data;
 
 static void create_bool_data_wrapper_for_serialization(
@@ -419,18 +424,22 @@ void fbs_deserialization(const std::string &buffer, int64_t &time_ms) {
           const auto *string_data =
               fields->GetAs<dingodb::fbs::common::string_data_wrapper>(i);
           (void)string_data->string_data();
+#if defined(FBS_USE_DATA)
           std::string s(string_data->string_data()->c_str(),
                         string_data->string_data()->size());
           (void)s;
+#endif
           break;
         }
         case dingodb::fbs::common::ScalarField_bytesdata: {
           const auto *bytes_data =
               fields->GetAs<dingodb::fbs::common::bytes_data_wrapper>(i);
           (void)bytes_data->bytes_data();
+#if defined(FBS_USE_DATA)
           std::string b(bytes_data->bytes_data()->begin(),
                         bytes_data->bytes_data()->end());
           (void)b;
+#endif
           break;
         }
         case dingodb::fbs::common::ScalarField_NONE:
