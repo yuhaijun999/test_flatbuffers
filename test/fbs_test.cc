@@ -419,18 +419,18 @@ void fbs_deserialization(const std::string &buffer, int64_t &time_ms) {
           const auto *string_data =
               fields->GetAs<dingodb::fbs::common::string_data_wrapper>(i);
           (void)string_data->string_data();
-          //   std::string s(string_data->string_data()->c_str(),
-          //                 string_data->string_data()->size());
-          //   (void)s;
+          std::string s(string_data->string_data()->c_str(),
+                        string_data->string_data()->size());
+          (void)s;
           break;
         }
         case dingodb::fbs::common::ScalarField_bytesdata: {
           const auto *bytes_data =
               fields->GetAs<dingodb::fbs::common::bytes_data_wrapper>(i);
           (void)bytes_data->bytes_data();
-          //   std::string b(bytes_data->bytes_data()->begin(),
-          //                 bytes_data->bytes_data()->end());
-          //   (void)b;
+          std::string b(bytes_data->bytes_data()->begin(),
+                        bytes_data->bytes_data()->end());
+          (void)b;
           break;
         }
         case dingodb::fbs::common::ScalarField_NONE:
