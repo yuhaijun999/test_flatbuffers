@@ -52,11 +52,21 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  if (argc > 3) {
+    int tmp_array_size = 0;
+    try {
+      int tmp_array_size = atoi(argv[3]);
+      array_size = tmp_array_size;
+    } catch (...) {
+    }
+  }
+
   std::cout << "using : argv[1] is type [pb|fbs|all] default all. argv[2] is "
-               "times default 100."
+               "times default 100. argv[3] is array size default 1 ."
             << std::endl;
 
-  std::cout << "type : " << type << " times : " << times << std::endl;
+  std::cout << "type : " << type << " times : " << times
+            << " array_size : " << array_size << std::endl;
 
   if (std::string("all") == type || std::string("pb") == type) {
     for (int i = 0; i < times; i++) {
