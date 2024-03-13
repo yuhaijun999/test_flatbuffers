@@ -15,7 +15,7 @@
 #define FBS_TEST_H
 
 #include <string>
-void fbs_serialization(int times, std::string &buffer);  // NOLINT
-void fbs_deserialization(const std::string &buffer);
+void fbs_serialization(int times, std::string &buffer, int64_t &time_ms);  // NOLINT
+void fbs_deserialization(const std::string &buffer, int64_t &time_ms);
 
 #endif /* FBS_TEST_H */

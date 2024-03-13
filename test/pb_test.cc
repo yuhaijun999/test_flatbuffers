@@ -139,7 +139,8 @@ static void create_scalar_value_for_serialization(
       {key, std::move(scalar_value)});
 }
 
-void pb_serialization(int times, std::string &buffer) {
+void pb_serialization(int times, std::string &buffer, int64_t &time_ms) {
+  TimeDiff time_diff;
   dingodb::pb::common::VectorScalardata vector_scalar_data;
   std::string key;
 
@@ -159,9 +160,11 @@ void pb_serialization(int times, std::string &buffer) {
       vector_scalar_data, times, dingodb::pb::common::ScalarFieldType::BYTES);
 
   buffer = vector_scalar_data.SerializeAsString();
+  time_ms = time_diff.GetDiff();
 
 }  // NOLINT
-void pb_deserialization(const std::string &buffer) {
+void pb_deserialization(const std::string &buffer, int64_t &time_ms) {
+  TimeDiff time_diff;
   dingodb::pb::common::VectorScalardata vector_scalar;
   if (!vector_scalar.ParseFromString(buffer)) {
     std::cout << "ParseFromString failed" << std::endl;
@@ -192,12 +195,17 @@ void pb_deserialization(const std::string &buffer) {
         (void)double_data;
       } else if (field.has_string_data()) {
         const auto &string_data = field.string_data();
+        (void)string_data;
       } else if (field.has_bytes_data()) {
         const auto &bytes_data = field.bytes_data();
+        (void)bytes_data;
       } else {
       }
     }
   }
 
   // vector_scalar.DebugString();
+  // vector_scalar.ShortDebugString();
+
+  time_ms = time_diff.GetDiff();
 }

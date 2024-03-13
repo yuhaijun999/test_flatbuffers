@@ -212,13 +212,15 @@ static auto create_scalar_value_for_serialization(
                                                  types, fields);
 }
 
-static auto create_scalar_data_map_entry_for_serialization(
-    flatbuffers::FlatBufferBuilder &builder, const std::string &key,  // NOLINT
-    dingodb::fbs::common::ScalarFieldType scalar_field_type, int times) {
-  return dingodb::fbs::common::CreateScalarDataMapEntry(
-      builder, builder.CreateString(key),
-      create_scalar_value_for_serialization(builder, scalar_field_type, times));
-}
+// [[deprecated]] static auto create_scalar_data_map_entry_for_serialization(
+//     flatbuffers::FlatBufferBuilder &builder, const std::string &key,  //
+//     NOLINT dingodb::fbs::common::ScalarFieldType scalar_field_type, int
+//     times) {
+//   return dingodb::fbs::common::CreateScalarDataMapEntry(
+//       builder, builder.CreateString(key),
+//       create_scalar_value_for_serialization(builder, scalar_field_type,
+//       times));
+// }
 
 static auto create_vector_scalar_data_for_serialization(
     flatbuffers::FlatBufferBuilder &builder, int times) {
@@ -335,17 +337,21 @@ static auto create_vector_scalar_data_for_serialization(
   builder.Finish(vector_scalar_data);
 }
 
-void fbs_serialization(int times, std::string &buffer) {  // NOLINT
+void fbs_serialization(int times, std::string &buffer,
+                       int64_t &time_ms) {  // NOLINT
+  TimeDiff time_diff;
   flatbuffers::FlatBufferBuilder builder;
   create_vector_scalar_data_for_serialization(builder, times);
 
   buffer.resize(builder.GetSize(), 0);
   memcpy(buffer.data(), builder.GetBufferPointer(), builder.GetSize());
+  time_ms = time_diff.GetDiff();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void fbs_deserialization(const std::string &buffer) {
+void fbs_deserialization(const std::string &buffer, int64_t &time_ms) {
+  TimeDiff time_diff;
   flatbuffers::FlatBufferBuilder builder;
   builder.PushBytes(
       reinterpret_cast<unsigned char *>(const_cast<char *>(buffer.c_str())),
@@ -433,4 +439,6 @@ void fbs_deserialization(const std::string &buffer) {
       }
     }
   }
+
+  time_ms = time_diff.GetDiff();
 }

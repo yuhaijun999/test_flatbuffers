@@ -23,12 +23,28 @@ int main(int argc, char *argv[]) {
 
   std::string buffer;
   int times = 10;
+  int64_t pb_serialization_time_ms = 0;
+  int64_t pb_deserialization_time_ms = 0;
+  int64_t fbs_serialization_time_ms = 0;
+  int64_t fbs_deserialization_time_ms = 0;
 
-  fbs_serialization(times, buffer);
-  fbs_deserialization(buffer);
+  pb_serialization(times, buffer, pb_serialization_time_ms);
+  pb_deserialization(buffer, pb_deserialization_time_ms);
 
-  //   pb_serialization(times, buffer);
-  //   pb_deserialization(buffer);
+  std::cout << "pb_serialization : " << pb_serialization_time_ms << " ms"
+            << std::endl;
+
+  std::cout << "pb_deserialization : " << pb_deserialization_time_ms << " ms"
+            << std::endl;
+
+  fbs_serialization(times, buffer, fbs_serialization_time_ms);
+  fbs_deserialization(buffer, fbs_deserialization_time_ms);
+
+  std::cout << "fbs_serialization : " << fbs_serialization_time_ms << " ms"
+            << std::endl;
+
+  std::cout << "fbs_deserialization : " << fbs_deserialization_time_ms << " ms"
+            << std::endl;
 
   return 0;
 }

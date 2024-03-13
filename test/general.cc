@@ -32,10 +32,18 @@ double GeneralData::get_double_data() {
   return double_data;
 }
 std::string GeneralData::get_string_data() {
-  return string_data + std::to_string(++string_data_index);
+  return "[" + std::to_string(++string_data_index) + "]" + string_data;
 }
 std::string GeneralData::get_bytes_data() {
-  return bytes_data + std::to_string(++bytes_data_index);
+  return "[" + std::to_string(++bytes_data_index) + "]" + bytes_data;
 }
 std::string GeneralData::get_key_prefix() { return key_prefix; }
 int32_t GeneralData::get_key_prefix_index() { return key_prefix_index++; }
+
+TimeDiff::TimeDiff() { start = std::chrono::steady_clock::now(); }
+TimeDiff::~TimeDiff() {}
+int64_t TimeDiff::GetDiff() {
+  end = std::chrono::steady_clock::now();
+  return std::chrono::duration_cast<std::chrono::microseconds>(end - start)
+      .count();
+}

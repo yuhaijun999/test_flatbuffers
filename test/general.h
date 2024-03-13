@@ -14,6 +14,7 @@
 #ifndef GENERAL_H_
 #define GENERAL_H_
 
+#include <chrono>
 #include <cstdint>
 #include <string>
 
@@ -122,6 +123,20 @@ class GeneralData {
       "29690a286655424c495f444e55004e905449545f534553540a2920202020656d004ea073"
       "736761286554535441535522207542004eb06c6920646e7574697420736522740a29004"
       "e736761286554535441535522201";
+};
+
+class TimeDiff {
+ public:
+  TimeDiff();
+  ~TimeDiff();
+  int64_t GetDiff();
+
+ private:
+  std::chrono::time_point<std::chrono::steady_clock, std::chrono::nanoseconds>
+      start;
+
+  std::chrono::time_point<std::chrono::steady_clock, std::chrono::nanoseconds>
+      end;
 };
 
 #endif  // GENERAL_H_
