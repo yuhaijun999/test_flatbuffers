@@ -13,6 +13,8 @@
 // limitations under the License.
 #include "general.h"
 
+#include <algorithm>
+#include <cctype>
 #include <chrono>
 
 GeneralData::GeneralData() {}
@@ -48,4 +50,75 @@ int64_t TimeDiff::GetDiff() {
   end = std::chrono::steady_clock::now();
   return std::chrono::duration_cast<std::chrono::nanoseconds>(end - start)
       .count();
+}
+
+TEST_TYPE get_test_type(const char *str) {
+  TEST_TYPE tt = TEST_TYPE::TEST_TYPE_NONE;
+
+  std::string s(str);
+  std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+
+  if (std::string("bool") == s) {
+    tt = TEST_TYPE::TEST_TYPE_BOOL;
+  } else if (std::string("int") == s || std::string("int32") == s) {
+    tt = TEST_TYPE::TEST_TYPE_INT;
+  } else if (std::string("long") == s || std::string("int64") == s) {
+    tt = TEST_TYPE::TEST_TYPE_LONG;
+  } else if (std::string("float") == s || std::string("float32") == s) {
+    tt = TEST_TYPE::TEST_TYPE_FLOAT;
+  } else if (std::string("double") == s || std::string("float64") == s) {
+    tt = TEST_TYPE::TEST_TYPE_DOUBLE;
+  } else if (std::string("string") == s) {
+    tt = TEST_TYPE::TEST_TYPE_STRING;
+  } else if (std::string("bytes") == s) {
+    tt = TEST_TYPE::TEST_TYPE_BYTES;
+  }
+
+  return tt;
+}
+
+std::string show_types(const std::set<TEST_TYPE> &tts) {
+  std::string s;
+  bool is_first = true;
+
+  for (const auto &tt : tts) {
+    if (!is_first) {
+      s += ",";
+    }
+    switch (tt) {
+      case TEST_TYPE::TEST_TYPE_BOOL: {
+        s += "bool";
+        break;
+      }
+      case TEST_TYPE::TEST_TYPE_INT: {
+        s += "int";
+        break;
+      }
+      case TEST_TYPE::TEST_TYPE_LONG: {
+        s += "long";
+        break;
+      }
+      case TEST_TYPE::TEST_TYPE_FLOAT: {
+        s += "float";
+        break;
+      }
+      case TEST_TYPE::TEST_TYPE_DOUBLE: {
+        s += "double";
+        break;
+      }
+      case TEST_TYPE::TEST_TYPE_STRING: {
+        s += "string";
+        break;
+      }
+      case TEST_TYPE::TEST_TYPE_BYTES: {
+        s += "bytes";
+        break;
+      }
+      case TEST_TYPE::TEST_TYPE_NONE:
+        break;
+    }
+    is_first = false;
+  }
+
+  return s;
 }

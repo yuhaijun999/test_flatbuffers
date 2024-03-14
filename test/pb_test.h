@@ -15,9 +15,11 @@
 #ifndef PB_TEST_H
 #define PB_TEST_H
 
+#include <set>
 #include <string>
+#include "general.h"
 void pb_serialization(int array_size, std::string &buffer,
-                      int64_t &time_ms);  // NOLINT
+                      int64_t &time_ms, const std::set<TEST_TYPE> &tts);  // NOLINT
 void pb_deserialization(const std::string &buffer, int64_t &time_ms);
 
 #endif /* PB_TEST_H */

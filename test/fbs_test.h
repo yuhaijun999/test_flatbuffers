@@ -14,9 +14,11 @@
 #ifndef FBS_TEST_H
 #define FBS_TEST_H
 
+#include <set>
 #include <string>
-void fbs_serialization(int array_size, std::string &buffer,
-                       int64_t &time_ms);  // NOLINT
+#include "general.h"
+void fbs_serialization(int array_size, std::string &buffer, int64_t &time_ms,
+                       const std::set<TEST_TYPE> &tts);  // NOLINT
 void fbs_deserialization(const std::string &buffer, int64_t &time_ms);
 
 #endif /* FBS_TEST_H */

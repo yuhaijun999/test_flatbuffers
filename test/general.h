@@ -16,6 +16,7 @@
 
 #include <chrono>
 #include <cstdint>
+#include <set>
 #include <string>
 
 class GeneralData {
@@ -46,7 +47,8 @@ class GeneralData {
   double double_data = DOUBLE_DATA_START;
   std::string string_data = STRING_DATA_START;
   std::string bytes_data = BYTE_DATA_START;
-  std::string key_prefix = "key";
+  std::string key_prefix =
+      "key source and configuration filesObject form shall";
   int32_t string_data_index = 0;
   int32_t bytes_data_index = 0;
   int32_t key_prefix_index = 0;
@@ -138,5 +140,20 @@ class TimeDiff {
   std::chrono::time_point<std::chrono::steady_clock, std::chrono::nanoseconds>
       end;
 };
+
+enum class TEST_TYPE : uint8_t {
+  TEST_TYPE_NONE = 0,
+  TEST_TYPE_BOOL = 1,
+  TEST_TYPE_INT = 2,
+  TEST_TYPE_LONG = 3,
+  TEST_TYPE_FLOAT = 4,
+  TEST_TYPE_DOUBLE = 5,
+  TEST_TYPE_STRING = 6,
+  TEST_TYPE_BYTES = 7,
+};
+
+TEST_TYPE get_test_type(const char *str);
+
+std::string show_types(const std::set<TEST_TYPE> &tts);
 
 #endif  // GENERAL_H_

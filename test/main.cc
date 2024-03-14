@@ -13,12 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <cstddef>
 #include <cstdint>
 #include <iostream>
+#include <set>
 
 #include "fbs_test.h"  // NOLINT
-#include "pb_test.h"   // NOLINT
+#include "general.h"
+#include "pb_test.h"  // NOLINT
 
 int main(int argc, char *argv[]) {
   std::string buffer;
@@ -31,7 +32,7 @@ int main(int argc, char *argv[]) {
   int64_t pb_bytes = 0;
   int64_t fbs_bytes = 0;
   std::string type = "all";
-
+  std::set<TEST_TYPE> tts;
   std::string tmp_type;
 
   if (argc > 1) {
@@ -49,7 +50,7 @@ int main(int argc, char *argv[]) {
   if (argc > 2) {
     int tmp_times = 0;
     try {
-      int tmp_times = atoi(argv[2]);
+      tmp_times = atoi(argv[2]);
       times = tmp_times;
     } catch (...) {
     }
@@ -58,24 +59,50 @@ int main(int argc, char *argv[]) {
   if (argc > 3) {
     int tmp_array_size = 0;
     try {
-      int tmp_array_size = atoi(argv[3]);
+      tmp_array_size = atoi(argv[3]);
       array_size = tmp_array_size;
     } catch (...) {
     }
   }
 
+  std::set<TEST_TYPE> tmp_tts;
+  if (argc > 4) {
+    for (int i = 4; i < argc; i++) {
+      TEST_TYPE tt = get_test_type(argv[i]);
+      if (tt != TEST_TYPE::TEST_TYPE_NONE) {
+        tmp_tts.insert(tt);
+      }
+    }
+  }
+
+  if (tmp_tts.empty()) {
+    std::cout << "not set any types. use all." << std::endl;
+    tts.insert(TEST_TYPE::TEST_TYPE_BOOL);
+    tts.insert(TEST_TYPE::TEST_TYPE_INT);
+    tts.insert(TEST_TYPE::TEST_TYPE_LONG);
+    tts.insert(TEST_TYPE::TEST_TYPE_FLOAT);
+    tts.insert(TEST_TYPE::TEST_TYPE_DOUBLE);
+    tts.insert(TEST_TYPE::TEST_TYPE_STRING);
+    tts.insert(TEST_TYPE::TEST_TYPE_BYTES);
+  } else {
+    tts = tmp_tts;
+  }
+
   std::cout << "using : argv[1] is type [pb|fbs|all] default all. argv[2] is "
-               "times default 100. argv[3] is array size default 1 ."
+               "times default 100. argv[3] is array size default 1 . argv[4] "
+               "and other test data types default all."
             << std::endl;
 
   std::cout << "type : " << type << " times : " << times
             << " array_size : " << array_size << std::endl;
 
+  std::cout << "types : " << show_types(tts) << std::endl;
+
   if (std::string("all") == type || std::string("pb") == type) {
     for (int i = 0; i < times; i++) {
       int64_t serialization_time_ns = 0;
       int64_t deserialization_time_ns = 0;
-      pb_serialization(array_size, buffer, serialization_time_ns);
+      pb_serialization(array_size, buffer, serialization_time_ns, tts);
       pb_bytes += buffer.size();
       pb_deserialization(buffer, deserialization_time_ns);
 
@@ -95,7 +122,7 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < times; i++) {
       int64_t serialization_time_ns = 0;
       int64_t deserialization_time_ns = 0;
-      fbs_serialization(array_size, buffer, serialization_time_ns);
+      fbs_serialization(array_size, buffer, serialization_time_ns, tts);
       fbs_bytes += buffer.size();
       fbs_deserialization(buffer, deserialization_time_ns);
 

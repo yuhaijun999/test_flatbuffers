@@ -144,32 +144,53 @@ static void create_scalar_value_for_serialization(
       {key, std::move(scalar_value)});
 }
 
-void pb_serialization(int array_size, std::string &buffer, int64_t &time_ms) {
+void pb_serialization(int array_size, std::string &buffer, int64_t &time_ms,
+                      const std::set<TEST_TYPE> &tts) {
   TimeDiff time_diff;
   dingodb::pb::common::VectorScalardata vector_scalar_data;
   std::string key;
 
-  create_scalar_value_for_serialization(
-      vector_scalar_data, array_size,
-      dingodb::pb::common::ScalarFieldType::BOOL);
-  create_scalar_value_for_serialization(
-      vector_scalar_data, array_size,
-      dingodb::pb::common::ScalarFieldType::INT32);
-  create_scalar_value_for_serialization(
-      vector_scalar_data, array_size,
-      dingodb::pb::common::ScalarFieldType::INT64);
-  create_scalar_value_for_serialization(
-      vector_scalar_data, array_size,
-      dingodb::pb::common::ScalarFieldType::FLOAT32);
-  create_scalar_value_for_serialization(
-      vector_scalar_data, array_size,
-      dingodb::pb::common::ScalarFieldType::DOUBLE);
-  create_scalar_value_for_serialization(
-      vector_scalar_data, array_size,
-      dingodb::pb::common::ScalarFieldType::STRING);
-  create_scalar_value_for_serialization(
-      vector_scalar_data, array_size,
-      dingodb::pb::common::ScalarFieldType::BYTES);
+  if (auto iter = tts.find(TEST_TYPE::TEST_TYPE_BOOL); iter != tts.end()) {
+    create_scalar_value_for_serialization(
+        vector_scalar_data, array_size,
+        dingodb::pb::common::ScalarFieldType::BOOL);
+  }
+
+  if (auto iter = tts.find(TEST_TYPE::TEST_TYPE_INT); iter != tts.end()) {
+    create_scalar_value_for_serialization(
+        vector_scalar_data, array_size,
+        dingodb::pb::common::ScalarFieldType::INT32);
+  }
+
+  if (auto iter = tts.find(TEST_TYPE::TEST_TYPE_LONG); iter != tts.end()) {
+    create_scalar_value_for_serialization(
+        vector_scalar_data, array_size,
+        dingodb::pb::common::ScalarFieldType::INT64);
+  }
+
+  if (auto iter = tts.find(TEST_TYPE::TEST_TYPE_FLOAT); iter != tts.end()) {
+    create_scalar_value_for_serialization(
+        vector_scalar_data, array_size,
+        dingodb::pb::common::ScalarFieldType::FLOAT32);
+  }
+
+  if (auto iter = tts.find(TEST_TYPE::TEST_TYPE_DOUBLE); iter != tts.end()) {
+    create_scalar_value_for_serialization(
+        vector_scalar_data, array_size,
+        dingodb::pb::common::ScalarFieldType::DOUBLE);
+  }
+
+  if (auto iter = tts.find(TEST_TYPE::TEST_TYPE_STRING); iter != tts.end()) {
+    create_scalar_value_for_serialization(
+        vector_scalar_data, array_size,
+        dingodb::pb::common::ScalarFieldType::STRING);
+  }
+
+  if (auto iter = tts.find(TEST_TYPE::TEST_TYPE_BYTES); iter != tts.end()) {
+    create_scalar_value_for_serialization(
+        vector_scalar_data, array_size,
+        dingodb::pb::common::ScalarFieldType::BYTES);
+  }
 
   buffer = vector_scalar_data.SerializeAsString();
   time_ms = time_diff.GetDiff();
