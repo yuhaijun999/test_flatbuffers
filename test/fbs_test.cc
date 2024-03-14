@@ -28,7 +28,7 @@
 #ifndef FBS_USE_DATA
 #define FBS_USE_DATA
 #endif
-#undef FBS_USE_DATA
+// #undef FBS_USE_DATA
 
 static GeneralData general_data;
 

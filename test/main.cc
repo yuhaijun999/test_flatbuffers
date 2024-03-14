@@ -24,10 +24,10 @@ int main(int argc, char *argv[]) {
   std::string buffer;
   int array_size = 10;
   int times = 100;
-  int64_t pb_serialization_time_ms = 0;
-  int64_t pb_deserialization_time_ms = 0;
-  int64_t fbs_serialization_time_ms = 0;
-  int64_t fbs_deserialization_time_ms = 0;
+  int64_t pb_serialization_time_ns = 0;
+  int64_t pb_deserialization_time_ns = 0;
+  int64_t fbs_serialization_time_ns = 0;
+  int64_t fbs_deserialization_time_ns = 0;
   int64_t pb_bytes = 0;
   int64_t fbs_bytes = 0;
   std::string type = "all";
@@ -73,70 +73,70 @@ int main(int argc, char *argv[]) {
 
   if (std::string("all") == type || std::string("pb") == type) {
     for (int i = 0; i < times; i++) {
-      int64_t serialization_time_ms = 0;
-      int64_t deserialization_time_ms = 0;
-      pb_serialization(array_size, buffer, serialization_time_ms);
+      int64_t serialization_time_ns = 0;
+      int64_t deserialization_time_ns = 0;
+      pb_serialization(array_size, buffer, serialization_time_ns);
       pb_bytes += buffer.size();
-      pb_deserialization(buffer, deserialization_time_ms);
+      pb_deserialization(buffer, deserialization_time_ns);
 
-      pb_serialization_time_ms += serialization_time_ms;
-      pb_deserialization_time_ms += deserialization_time_ms;
+      pb_serialization_time_ns += serialization_time_ns;
+      pb_deserialization_time_ns += deserialization_time_ns;
     }
 
-    std::cout << "protobuf   serialization   : " << pb_serialization_time_ms
-              << " ms"
+    std::cout << "protobuf   serialization   : " << pb_serialization_time_ns
+              << " ns"
               << " bytes : " << pb_bytes << std::endl;
 
-    std::cout << "protobuf   deserialization : " << pb_deserialization_time_ms
-              << " ms" << std::endl;
+    std::cout << "protobuf   deserialization : " << pb_deserialization_time_ns
+              << " ns" << std::endl;
   }
 
   if (std::string("all") == type || std::string("fbs") == type) {
     for (int i = 0; i < times; i++) {
-      int64_t serialization_time_ms = 0;
-      int64_t deserialization_time_ms = 0;
-      fbs_serialization(array_size, buffer, serialization_time_ms);
+      int64_t serialization_time_ns = 0;
+      int64_t deserialization_time_ns = 0;
+      fbs_serialization(array_size, buffer, serialization_time_ns);
       fbs_bytes += buffer.size();
-      fbs_deserialization(buffer, deserialization_time_ms);
+      fbs_deserialization(buffer, deserialization_time_ns);
 
-      fbs_serialization_time_ms += serialization_time_ms;
-      fbs_deserialization_time_ms += deserialization_time_ms;
+      fbs_serialization_time_ns += serialization_time_ns;
+      fbs_deserialization_time_ns += deserialization_time_ns;
     }
 
-    std::cout << "flatbuffer serialization   : " << fbs_serialization_time_ms
-              << " ms"
+    std::cout << "flatbuffer serialization   : " << fbs_serialization_time_ns
+              << " ns"
               << " bytes : " << fbs_bytes << std::endl;
 
-    std::cout << "flatbuffer deserialization : " << fbs_deserialization_time_ms
-              << " ms" << std::endl;
+    std::cout << "flatbuffer deserialization : " << fbs_deserialization_time_ns
+              << " ns" << std::endl;
   }
 
-  if (0 != fbs_serialization_time_ms && 0 != pb_serialization_time_ms) {
-    if (fbs_serialization_time_ms > pb_serialization_time_ms) {
-      std::cout << "serialization_time_ms   flatbuffer/protobuf : "
-                << static_cast<double>(fbs_serialization_time_ms) /
-                       static_cast<double>(pb_serialization_time_ms)
+  if (0 != fbs_serialization_time_ns && 0 != pb_serialization_time_ns) {
+    if (fbs_serialization_time_ns > pb_serialization_time_ns) {
+      std::cout << "serialization_time_ns   flatbuffer/protobuf : "
+                << static_cast<double>(fbs_serialization_time_ns) /
+                       static_cast<double>(pb_serialization_time_ns)
                 << std::endl;
     } else {
-      std::cout << "serialization_time_ms   protobuf/flatbuffer : "
+      std::cout << "serialization_time_ns   protobuf/flatbuffer : "
                 << static_cast<double>(
-                       pb_serialization_time_ms /
-                       static_cast<double>(fbs_serialization_time_ms))
+                       pb_serialization_time_ns /
+                       static_cast<double>(fbs_serialization_time_ns))
                 << std::endl;
     }
   }
 
-  if (0 != fbs_deserialization_time_ms && 0 != pb_deserialization_time_ms) {
-    if (fbs_deserialization_time_ms > pb_deserialization_time_ms) {
-      std::cout << "deserialization_time_ms flatbuffer/protobuf : "
-                << static_cast<double>(fbs_deserialization_time_ms) /
-                       static_cast<double>(pb_deserialization_time_ms)
+  if (0 != fbs_deserialization_time_ns && 0 != pb_deserialization_time_ns) {
+    if (fbs_deserialization_time_ns > pb_deserialization_time_ns) {
+      std::cout << "deserialization_time_ns flatbuffer/protobuf : "
+                << static_cast<double>(fbs_deserialization_time_ns) /
+                       static_cast<double>(pb_deserialization_time_ns)
                 << std::endl;
     } else {
-      std::cout << "deserialization_time_ms protobuf/flatbuffer : "
+      std::cout << "deserialization_time_ns protobuf/flatbuffer : "
                 << static_cast<double>(
-                       pb_deserialization_time_ms /
-                       static_cast<double>(fbs_deserialization_time_ms))
+                       pb_deserialization_time_ns /
+                       static_cast<double>(fbs_deserialization_time_ns))
                 << std::endl;
     }
   }

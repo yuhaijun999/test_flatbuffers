@@ -13,6 +13,8 @@
 // limitations under the License.
 #include "general.h"
 
+#include <chrono>
+
 GeneralData::GeneralData() {}
 
 GeneralData::~GeneralData() {}
@@ -44,6 +46,6 @@ TimeDiff::TimeDiff() { start = std::chrono::steady_clock::now(); }
 TimeDiff::~TimeDiff() {}
 int64_t TimeDiff::GetDiff() {
   end = std::chrono::steady_clock::now();
-  return std::chrono::duration_cast<std::chrono::microseconds>(end - start)
+  return std::chrono::duration_cast<std::chrono::nanoseconds>(end - start)
       .count();
 }

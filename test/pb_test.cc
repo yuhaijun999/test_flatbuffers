@@ -17,6 +17,11 @@
 #include "common.pb.h"
 #include "general.h"
 
+#ifndef PB_USE_DATA
+#define PB_USE_DATA
+#endif
+// #undef PB_USE_DATA
+
 static GeneralData general_data;
 
 static void create_bool_data_for_serialization(
@@ -201,11 +206,22 @@ void pb_deserialization(const std::string &buffer, int64_t &time_ms) {
         auto double_data = field.double_data();
         (void)double_data;
       } else if (field.has_string_data()) {
-        const auto &string_data = field.string_data();
+#if defined(PB_USE_DATA)
+        std::string string_data(field.string_data());
         (void)string_data;
+#else
+        const std::string &string_data = field.string_data();
+        (void)string_data;
+#endif
       } else if (field.has_bytes_data()) {
-        const auto &bytes_data = field.bytes_data();
+#if defined(PB_USE_DATA)
+        std::string bytes_data(field.bytes_data());
         (void)bytes_data;
+#else
+        const std::string &bytes_data = field.bytes_data();
+        (void)bytes_data;
+#endif
+
       } else {
       }
     }
