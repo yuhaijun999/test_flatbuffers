@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
   std::cout << "type : " << type << " times : " << times
             << " array_size : " << array_size << std::endl;
 
-  std::cout << "types : " << show_types(tts) << std::endl;
+  std::cout << "types : [" << show_types(tts) << "]" << std::endl;
 
   if (std::string("all") == type || std::string("pb") == type) {
     for (int i = 0; i < times; i++) {
