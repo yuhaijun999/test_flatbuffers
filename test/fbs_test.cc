@@ -128,13 +128,16 @@ static void create_bytes_data_wrapper_for_serialization(
     const std::string &value) {
   field_types.push_back(
       dingodb::fbs::common::ScalarField::ScalarField_bytesdata);
-  std::vector<uint8_t> internal_value;
-  internal_value.reserve(value.size());
-  std::copy(value.begin(), value.end(), std::back_inserter(internal_value));
+  // std::vector<uint8_t> internal_value;
+  // internal_value.reserve(value.size());
+  //  std::copy(value.begin(), value.end(), std::back_inserter(internal_value));
 
-  auto off = dingodb::fbs::common::Createbytes_data_wrapper(
-                 builder, builder.CreateVector(internal_value))
-                 .Union();
+  auto off =
+      dingodb::fbs::common::Createbytes_data_wrapper(
+          builder, builder.CreateVector(
+                       reinterpret_cast<const unsigned char *>(value.data()),
+                       value.size()))
+          .Union();
 
   field_values.push_back(off);
 }
