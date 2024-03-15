@@ -17,10 +17,10 @@
 #include "common.pb.h"
 #include "general.h"
 
-#ifndef PB_USE_DATA
-#define PB_USE_DATA
+#ifndef PB_USE_COPY
+#define PB_USE_COPY
 #endif
-// #undef PB_USE_DATA
+#undef PB_USE_COPY
 
 static GeneralData general_data;
 
@@ -227,7 +227,7 @@ void pb_deserialization(const std::string &buffer, int64_t &time_ms) {
         auto double_data = field.double_data();
         (void)double_data;
       } else if (field.has_string_data()) {
-#if defined(PB_USE_DATA)
+#if defined(PB_USE_COPY)
         std::string string_data(field.string_data());
         (void)string_data;
 #else
@@ -235,7 +235,7 @@ void pb_deserialization(const std::string &buffer, int64_t &time_ms) {
         (void)string_data;
 #endif
       } else if (field.has_bytes_data()) {
-#if defined(PB_USE_DATA)
+#if defined(PB_USE_COPY)
         std::string bytes_data(field.bytes_data());
         (void)bytes_data;
 #else

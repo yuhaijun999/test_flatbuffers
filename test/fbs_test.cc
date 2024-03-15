@@ -18,6 +18,7 @@
 #include <iostream>
 #include <iterator>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "common_generated.h"  // NOLINT
@@ -25,10 +26,10 @@
 #include "flatbuffers/verifier.h"
 #include "general.h"
 
-#ifndef FBS_USE_DATA
-#define FBS_USE_DATA
+#ifndef FBS_USE_COPY
+#define FBS_USE_COPY
 #endif
-// #undef FBS_USE_DATA
+#undef FBS_USE_COPY
 
 static GeneralData general_data;
 
@@ -438,10 +439,19 @@ void fbs_deserialization(const std::string &buffer, int64_t &time_ms) {
           const auto *string_data =
               fields->GetAs<dingodb::fbs::common::string_data_wrapper>(i);
           (void)string_data->string_data();
-#if defined(FBS_USE_DATA)
+#if defined(FBS_USE_COPY)
           std::string s(string_data->string_data()->c_str(),
                         string_data->string_data()->size());
           (void)s;
+
+#else
+          std::string_view sv((string_data->string_data()->c_str()),
+                              string_data->string_data()->size());
+          (void)sv;
+          //   if (sv == s) {
+          //     std::cout << "string compare equal!!!" << std::endl;
+          //   }
+
 #endif
           break;
         }
@@ -449,10 +459,20 @@ void fbs_deserialization(const std::string &buffer, int64_t &time_ms) {
           const auto *bytes_data =
               fields->GetAs<dingodb::fbs::common::bytes_data_wrapper>(i);
           (void)bytes_data->bytes_data();
-#if defined(FBS_USE_DATA)
+#if defined(FBS_USE_COPY)
+
           std::string b(bytes_data->bytes_data()->begin(),
                         bytes_data->bytes_data()->end());
           (void)b;
+
+#else
+          std::string_view sv(
+              reinterpret_cast<const char *>(bytes_data->bytes_data()->data()),
+              bytes_data->bytes_data()->size());
+          (void)sv;
+          //   if (sv == b) {
+          //     std::cout << "bytes compare equal!!!" << std::endl;
+          //   }
 #endif
           break;
         }
