@@ -19,6 +19,7 @@
 
 #include "fbs_test.h"  // NOLINT
 #include "general.h"
+#include "pb_create.h"
 #include "pb_test.h"  // NOLINT
 
 int main(int argc, char *argv[]) {

@@ -86,4 +86,4 @@ link_directories("/home/server/app/flatbuffers-v24.3.6-debug/lib64")
 link_libraries(protobufd protobuf-lited)
 link_libraries(flatbuffers)
 
-add_executable(main general.cc common.pb.cc pb_test.cc fbs_test.cc main.cc)
+add_executable(main pb_create.cc fbs_create.cc general.cc common.pb.cc pb_test.cc fbs_test.cc main.cc)

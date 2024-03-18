@@ -487,4 +487,18 @@ void fbs_deserialization(const std::string &buffer, int64_t &time_ms) {
   }
 
   time_ms = time_diff.GetDiff();
+
+  auto value = vector_scalar_data->scalar_data()->LookupByKey(
+      "key source and configuration filesObject form shall_string_1");
+  if (value) {
+    std::string key_string_2(value->key()->c_str(), value->key()->size());
+
+    std::cout << key_string_2 << std::endl;
+
+    std::cout << "fields_type : "
+              << value->value()
+                     ->fields_type()
+                     ->GetAs<dingodb::fbs::common::ScalarField>(0)
+              << std::endl;
+  }
 }
