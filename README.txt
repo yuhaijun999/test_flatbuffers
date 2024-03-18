@@ -10,6 +10,18 @@ debug:
 cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug ..
 bear --append -- make -j
 
+用法:
+# 默认 all(pb, fbs) 100 次循环  数组长度为10 全部字段 测试
+./main
+
+还可以这样
+# all 1000 次循环  数组长度为1 测试字段为 bool int long float double string bytes
+./main all 1000 1 bool int long float double string bytes
+
+或者这样也可以
+./main all 1000 1 int double string
+./main pb 1000 1 int double string
+./main fbs 1000 1 int double string
 
 
 参考：
