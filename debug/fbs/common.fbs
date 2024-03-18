@@ -1,0 +1,71 @@
+namespace dingodb.fbs.common;
+
+struct bool_data_wrapper{
+bool_data : bool;
+}
+
+struct int_data_wrapper{
+int_data : int32;
+}
+
+struct long_data_wrapper{
+long_data : int64;
+}
+
+struct float_data_wrapper{
+float_data : float;
+}
+
+
+struct double_data_wrapper{
+double_data : double;
+}
+
+table string_data_wrapper{
+string_data : string;
+}
+
+table bytes_data_wrapper{
+bytes_data : [ubyte];
+}
+
+
+union ScalarField {
+booldata : bool_data_wrapper,
+intdata : int_data_wrapper,
+longdata : long_data_wrapper,
+floatdata : float_data_wrapper,
+doubledata : double_data_wrapper,
+stringdata : string_data_wrapper,
+bytesdata : bytes_data_wrapper,
+}
+
+enum ScalarFieldType : int {
+    NONE = 0,
+    BOOL = 1,
+    INT8 = 2,
+    INT16 = 3,
+    INT32 = 4,
+    INT64 = 5,
+    FLOAT32 = 6,
+    DOUBLE = 7,
+    STRING = 8,
+    BYTES = 9,
+}
+
+table ScalarValue {
+field_type : ScalarFieldType;
+fields : [ScalarField];
+}
+
+
+table ScalarDataMapEntry{
+key : string (key);
+value : ScalarValue;
+}
+
+table VectorScalardata {
+scalar_data : [ScalarDataMapEntry];
+}
+
+root_type VectorScalardata;
